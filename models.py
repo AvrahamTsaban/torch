@@ -1,6 +1,6 @@
 from torch import nn
 
-class Model(nn.Module):
+class Base_Model(nn.Module):
     def __init__(self, device="cpu"):
         super().__init__()
         self.flatten = nn.Flatten()
@@ -18,17 +18,17 @@ class Model(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-class Long_Model(Model):
+class Long_Model(Base_Model):
     def __init__(self, device="cpu"):
         super().__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28*28, 128),
+            nn.Linear(28*28, 1024),
             nn.ReLU(),
-            nn.Linear(128, 64),
+            nn.Linear(1024, 1024),
             nn.ReLU(),
-            nn.Linear(64, 32),
+            nn.Linear(1024, 1024),
             nn.ReLU(),
-            nn.Linear(32, 10)
+            nn.Linear(1024, 10)
         )
         self.to(device)

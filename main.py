@@ -1,41 +1,21 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from torchvision import datasets
-import torchvision.transforms.v2 as transforms
-
 from time import time
 
 from models import *
+from datasets import *
 
-# Define transformation to convert images to tensors with float32 dtype
-def to_tensor():
-    return transforms.Compose([
-            transforms.ToImage(),
-            transforms.ToDtype(torch.float, scale=True),
-        ])
-
-def main():
-    train_data = datasets.FashionMNIST(
-        root="data",
-        train=True,
-        download=True,
-        transform=to_tensor(),
-    )
-    test_data = datasets.FashionMNIST(
-        root="data",
-        train=False,
-        download=True,
-        transform=to_tensor(),
-    )
+def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu"):
 
     batch_size = 128
-    train_dataloader = DataLoader(train_data, batch_size=batch_size)
-    test_dataloader = DataLoader(test_data, batch_size=batch_size)
-
-    device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
-    model = Model(device=device)
-
+    train_dataloader = DataLoader(train_d, batch_size=batch_size)
+    test_dataloader = DataLoader(test_d1, batch_size=batch_size)
+    if test_d2:
+        test2_dataloader = DataLoader(test_d2, batch_size=batch_size)
+    
+    
+    model = model(device=device)
 
     loss_fn = nn.CrossEntropyLoss(reduction='mean')
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-3)
@@ -45,44 +25,54 @@ def main():
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train(train_dataloader, model, loss_fn, optimizer, device)
-        test(test_dataloader, model, loss_fn, device)
+        if test_d2:
+            test(test_dataloader, model, loss_fn, device, name="Test1")
+            test(test2_dataloader, model, loss_fn, device, name="Test2")
+        else:
+            test(test_dataloader, model, loss_fn, device)
+        print()
     print(f"Done! Training time: {time() - start_time:.2f} seconds")
 
 def train(dataloader, model, loss_fn, optimizer, device):
     model.train()
-    for batch, (X, y) in enumerate(dataloader):
-        X, y = X.to(device), y.to(device)
+    torch.set_grad_enabled(True)
+    train_loss, correct = 0, 0
 
-        # Compute prediction error
+    for X, y in dataloader:
+        X, y = X.to(device), y.to(device)
         pred = model(X) # gets a matrix of predictions
         loss = loss_fn(pred, y) # computes the loss
+
+        train_loss += loss.item()
+        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
         # Backpropagation
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        if batch % 100 == 0:
-            loss, current = loss.item(), (batch + 1) * len(X)
-            correct = (pred.argmax(1) == y).type(torch.float).sum().item()
-            accuracy = 100 * correct / len(X)
-            print(f"loss: {loss:>7f}  accuracy: {accuracy:>5.1f}%  [{current:>5d}/{len(dataloader.dataset):>5d}]")
+    loss = train_loss / len(dataloader)
+    accuracy = 100 * correct / len(dataloader.dataset)
+    print(f"Train: accuracy - {accuracy:>5.1f}%, average loss - {loss:>7f}")
 
-def test(dataloader, model, loss_fn, device):
-    size = len(dataloader.dataset)
-    num_batches = len(dataloader)
+def test(dataloader, model, loss_fn, device, name="Test"):
     model.eval()
+    torch.set_grad_enabled(False)
     test_loss, correct = 0, 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(device), y.to(device)
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-    test_loss /= num_batches
-    correct /= size
-    print(f"Test: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+    for X, y in dataloader:
+        X, y = X.to(device), y.to(device)
+        pred = model(X)
+        loss = loss_fn(pred, y)
+
+        test_loss += loss.item()
+        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+    loss = test_loss / len(dataloader)
+    accuracy = 100 * correct / len(dataloader.dataset)
+    print(f"{name}: accuracy - {accuracy:>5.1f}%, average loss - {loss:>8f}")
 
 
 if __name__ == "__main__":
-    main()
+    device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+    deep_learning(train_d=number_train, test_d1=number_test, test_d2=my_fashion_test, device=device, model=Long_Model)
