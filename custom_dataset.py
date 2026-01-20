@@ -31,9 +31,14 @@ def mnistify(pil_img):
 
 if __name__ == "__main__":
     # Example usage
-    img = Image.open("./data/myFashion/7.1.png")
-    processed_img = mnistify(img)
-    processed_img.show();
+    path = "./data/myNums"
+    mnistified_dir = os.path.join(path, "mnistified")
+    os.makedirs(mnistified_dir, exist_ok=True)
+    images = [f for f in os.listdir(path) if f.endswith(".png")]
+    for img_name in images:
+        with Image.open(os.path.join(path, img_name)) as img:
+            processed_img = mnistify(img)
+            processed_img.save(os.path.join(mnistified_dir, img_name))
 
 
 class CustomDataset(Dataset):
