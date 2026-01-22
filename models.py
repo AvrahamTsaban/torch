@@ -1,5 +1,4 @@
 from torch import nn
-from torchvision.models import vgg16 as vgg16
 
 class Base_Model(nn.Module):
     def __init__(self, device="cpu"):
