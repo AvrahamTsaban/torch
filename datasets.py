@@ -19,6 +19,7 @@ datasets for training and testing:
 - my_fashion_test: CustomDataset for user-provided fashion images, processed to MNIST format
 - my_number_test: CustomDataset for user-provided number images, processed to MNIST format
 """
+
 fashion_train = datasets.FashionMNIST(
         root="data",
         train=True,

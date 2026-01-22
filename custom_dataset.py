@@ -1,5 +1,5 @@
 from PIL import Image
-from PIL import ImageOps;
+from PIL import ImageOps
 from torch.utils.data import Dataset
 import os
 
@@ -17,18 +17,18 @@ def mnistify(pil_img):
         img = background
     else:
         img = pil_img
-    img = img.convert("L");
-    img = ImageOps.autocontrast(img, cutoff=1);
-    img = img.point(lambda x: 255 if x>210 else x);
-    img = ImageOps.invert(img);
-    bbox = img.getbbox();
+    img = img.convert("L")
+    img = ImageOps.autocontrast(img, cutoff=1)
+    img = img.point(lambda x: 255 if x>210 else x)
+    img = ImageOps.invert(img)
+    bbox = img.getbbox()
     if bbox:
-        img = img.crop(bbox);
-    img = img.resize((28, 28), Image.Resampling.LANCZOS);
-    img = ImageOps.autocontrast(img, cutoff=1);
+        img = img.crop(bbox)
+    img = img.resize((28, 28), Image.Resampling.LANCZOS)
+    img = ImageOps.autocontrast(img, cutoff=1)
 
-    return img;
-
+    return img
+    
 if __name__ == "__main__":
     # Example usage
     path = "./data/myNums"
