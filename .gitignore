@@ -1,2 +1,4 @@
 /data/MNIST
 /data/FashionMNIST
+/__pycache__
+/.vscode
