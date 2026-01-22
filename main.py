@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from time import time
 
 from models import *
-from datasets import *
+from datasets import sets
 
 def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu", epochs=5):
 
@@ -101,12 +101,23 @@ def plot_results(train, data, real_data=None, test_name="Test", model_name="Mode
 
 def main():
     device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+    models = [Base_Model, Long_Model, Giant_Model]
+    epochs = 20
 
-    train, data, real_data = deep_learning(train_d=fashion_train, test_d1=fashion_test, test_d2=my_fashion_test, device=device, model=Giant_Model, epochs=10)
-    plot_results(train, data, real_data, test_name="Fashion Test", model_name="Giant_Model")
+    results = []
+    for model in models:
+        for dataset in sets:
+            train_accr, validation_accr, test_accr = deep_learning(train_d=dataset.train, test_d1=dataset.validation, test_d2=dataset.test, device=device, model=model, epochs=epochs)
+            results.append({
+                'name': dataset.name,
+                'model': model.name,
+                'train': train_accr,
+                'validation': validation_accr,
+                'test': test_accr,
+            })
 
-    train, data, real_data = deep_learning(train_d=number_train, test_d1=number_test, test_d2=my_number_test, device=device, model=Giant_Model, epochs=10)
-    plot_results(train, data, real_data, test_name="Number Test", model_name="Giant_Model")
+    for result in results:
+        plot_results(result['train'], result['validation'], result['test'], test_name=result['name'] + ' Test', model_name=result['model'] + ' Model')
 
 if __name__ == "__main__":
     main()
