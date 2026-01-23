@@ -53,3 +53,8 @@ class Giant_Model(Base_Model):
         )
         self.to(device)
 
+if __name__ == "__main__":
+    models = [Base_Model, Long_Model, Giant_Model]
+    for model in models:
+        net = model()
+        print(f"total parameters in {model.__name__}: {sum(p.numel() for p in net.parameters() if p.requires_grad)}")
