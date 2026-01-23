@@ -8,6 +8,19 @@ from models import *
 from datasets import *
 
 def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu", epochs=5):
+    """Trains and tests a model on the given datasets.
+    Args:
+        train_d: training dataset
+        test_d1: built-in test dataset
+        test_d2: custom test dataset (optional)
+        model: model class to instantiate
+        device: device to use ("cpu" or "cuda")
+        epochs: number of training epochs
+    Returns:
+        train_results: list of training accuracies per epoch
+        test_results: list of built-in test accuracies per epoch
+        test2_results: list of custom test accuracies per epoch (if test_d2 is provided)
+    """
 
     batch_size = 128
     train_dataloader = DataLoader(train_d, batch_size=batch_size)
@@ -41,6 +54,17 @@ def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu"
     return train_results, test_results, test2_results if test_d2 else None
 
 def train(dataloader, model, loss_fn, optimizer, device):
+    """Trains the model for one epoch on the given dataloader.
+    Args:
+        dataloader: DataLoader for the training dataset
+        model: model to train
+        loss_fn: loss function
+        optimizer: optimizer for updating model parameters
+        device: device to use ("cpu" or "cuda")
+    Returns:
+        accuracy: training accuracy for the epoch
+        (under the hood, also updates the model parameters)
+    """
     model.train()
     torch.set_grad_enabled(True)
     train_loss, correct = 0, 0
@@ -64,6 +88,17 @@ def train(dataloader, model, loss_fn, optimizer, device):
     return accuracy
 
 def test(dataloader, model, loss_fn, device, name="Test", verbose=False):
+    """Tests the model on the given dataloader.
+    Args:
+        dataloader: DataLoader for the test dataset
+        model: model to test
+        loss_fn: loss function
+        device: device to use ("cpu" or "cuda")
+        name: name of the test (for printing purposes)
+        verbose: whether to print individual predictions. Don't use for datasets larger than a few samples.
+    Returns:
+        accuracy: test accuracy
+    """
     model.eval()
     torch.set_grad_enabled(False)
     test_loss, correct = 0, 0
@@ -86,6 +121,16 @@ def test(dataloader, model, loss_fn, device, name="Test", verbose=False):
 
     # תרשים דיוק לאורך epochs
 def plot_results(train, data, real_data=None, test_name="Test", model_name="Model"):
+    """Plots the accuracy results over epochs.
+    Args:
+        train: list of training accuracies per epoch
+        data: list of built-in test accuracies per epoch
+        real_data: list of custom test accuracies per epoch (optional)
+        test_name: name of the test (for title)
+        model_name: name of the model (for title)
+    Disclosure for teacher:
+        this function was completely written by copilot; I should get no credit for it.
+    """
     import matplotlib.pyplot as plt
     plt.figure(figsize=(10, 6))
     plt.plot(range(1, len(train) + 1), train, label='Train', marker='o')
@@ -100,6 +145,10 @@ def plot_results(train, data, real_data=None, test_name="Test", model_name="Mode
     plt.show()
 
 def main():
+    """Main function to run training and testing on different datasets and models.
+    - Trains and tests Giant_Model (example) on Fashion-MNIST dataset.
+    - Plots results.
+    - Repeats the process for the Number dataset."""
     device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 
     train, data, real_data = deep_learning(train_d=fashion_train, test_d1=fashion_test, test_d2=my_fashion_test, device=device, model=Giant_Model, epochs=10)

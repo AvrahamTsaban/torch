@@ -1,6 +1,8 @@
 from torch import nn
 from torchvision.models import vgg16 as vgg16
 
+"""Contains different model architectures for training."""
+
 class Base_Model(nn.Module):
     def __init__(self, device="cpu"):
         super().__init__()
