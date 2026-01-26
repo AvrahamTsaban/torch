@@ -1,8 +1,11 @@
-from tkinter.filedialog import test
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+from torchvision.utils import save_image
+
+from tkinter.filedialog import test
 from time import time
+import os
 
 from models import *
 from datasets import *
@@ -46,7 +49,7 @@ def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu"
         a = test(test_dataloader, model, loss_fn, device, name="Built in Test")
         test_results.append(a)
         if test_d2:
-            a = test(test2_dataloader, model, loss_fn, device, name="Custom Test")
+            a = test(test2_dataloader, model, loss_fn, device, name="Custom Test", verbose=True)
             test2_results.append(a)
         print()
         
@@ -95,7 +98,9 @@ def test(dataloader, model, loss_fn, device, name="Test", verbose=False):
         loss_fn: loss function
         device: device to use ("cpu" or "cuda")
         name: name of the test (for printing purposes)
-        verbose: whether to print individual predictions. Don't use for datasets larger than a few samples.
+        verbose: whether to print individual predictions and save images, classified by folders ("predicted_label/sample_i.png"). 
+        - Don't use for datasets larger than a few samples. 
+        - Default is False.
     Returns:
         accuracy: test accuracy
     """
@@ -112,7 +117,12 @@ def test(dataloader, model, loss_fn, device, name="Test", verbose=False):
         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         if verbose:
             for i in range(len(y)):
-                print(f"Predicted: {pred[i].argmax().item()}, actual: {y[i].item()}")
+                predict = pred[i].argmax().item()
+                print(f"Predicted: {predict}, actual: {y[i].item()}")
+                outpath = os.path.join(dataloader.dataset.path, "classified", str(predict), f"sample_{i}.png")
+                os.makedirs(os.path.dirname(outpath), exist_ok=True)
+                save_image(X[i], outpath)
+                
 
     loss = test_loss / len(dataloader)
     accuracy = 100 * correct / len(dataloader.dataset)
@@ -151,11 +161,11 @@ def main():
     - Repeats the process for the Number dataset."""
     device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 
-    train, data, real_data = deep_learning(train_d=fashion_train, test_d1=fashion_test, test_d2=my_fashion_test, device=device, model=Giant_Model, epochs=10)
-    plot_results(train, data, real_data, test_name="Fashion Test", model_name="Giant_Model")
+    train, data, real_data = deep_learning(train_d=fashion_train, test_d1=fashion_test, test_d2=my_fashion_test, device=device, model=Long_Model, epochs=10)
+    plot_results(train, data, real_data, test_name="Fashion Test", model_name="Long_Model")
 
-    train, data, real_data = deep_learning(train_d=number_train, test_d1=number_test, test_d2=my_number_test, device=device, model=Giant_Model, epochs=10)
-    plot_results(train, data, real_data, test_name="Number Test", model_name="Giant_Model")
+    train, data, real_data = deep_learning(train_d=number_train, test_d1=number_test, test_d2=my_number_test, device=device, model=Long_Model, epochs=10)
+    plot_results(train, data, real_data, test_name="Number Test", model_name="Long_Model")
 
 if __name__ == "__main__":
     main()
