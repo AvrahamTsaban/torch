@@ -66,10 +66,12 @@ This will:
 
 ### Using Custom Images
 
+**Requirements:**
 1. Place images in `data/myNums/` or `data/myFashion/`
-2. Name files with the label as the first character (e.g., `3_handwritten.png`)
-3. Supported format: PNG files
-4. The [`mnistify`](custom_dataset.py) function will automatically preprocess them
+2. **Name files with the label as the first character** (e.g., `3_handwritten.png` for digit 3)
+3. **Images must have a white or transparent background**
+4. Supported format: PNG files
+5. The [`mnistify`](custom_dataset.py) function will automatically preprocess them to MNIST format
 
 ## API Reference
 
