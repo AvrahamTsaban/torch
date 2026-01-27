@@ -195,4 +195,4 @@ GNU General Public License v3.0 - see [LICENSE](LICENSE)
 - Training uses AdamW optimizer (lr=1e-3, weight_decay=1e-3)
 - Batch size is set to 128
 - Models automatically move to available accelerator (CUDA if available)
-- Special thanks to claude sonnet for documenting this project in a minute
+- Special thanks to claude sonnet for writing this file in a minute
