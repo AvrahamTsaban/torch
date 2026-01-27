@@ -49,7 +49,7 @@ def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu"
         a = test(test_dataloader, model, loss_fn, device, name="Built in Test")
         test_results.append(a)
         if test_d2:
-            a = test(test2_dataloader, model, loss_fn, device, name="Custom Test", verbose=True)
+            a = test(test2_dataloader, model, loss_fn, device, name="Custom Test", verbose=False)
             test2_results.append(a)
         print()
         
