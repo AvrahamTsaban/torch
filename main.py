@@ -3,20 +3,19 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
-from tkinter.filedialog import test
 from time import time
 import os
 
-from models import *
+from models import models
 from datasets import sets
 
-def deep_learning(train_d, test_d1, test_d2=None, model=Base_Model, device="cpu", epochs=5):
+def deep_learning(model, train_d, test_d1, test_d2=None, device="cpu", epochs=5):
     """Trains and tests a model on the given datasets.
     Args:
-        train_d: training dataset
-        test_d1: built-in test dataset
-        test_d2: custom test dataset (optional)
         model: model class to instantiate
+        train_d: training dataset
+        test_d1: built-in test dataset (validation)
+        test_d2: custom test dataset (optional)
         device: device to use ("cpu" or "cuda")
         epochs: number of training epochs
     Returns:
@@ -160,13 +159,12 @@ def main():
     - Plots results.
     - Repeats the process for the Number dataset."""
     device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
-    models = [Base_Model, Long_Model, Giant_Model]
     epochs = 20
 
     results = []
     for model in models:
         for dataset in sets:
-            train_accr, validation_accr, test_accr = deep_learning(train_d=dataset.train, test_d1=dataset.validation, test_d2=dataset.test, device=device, model=model, epochs=epochs)
+            train_accr, validation_accr, test_accr = deep_learning(model=model, train_d=dataset.train, test_d1=dataset.validation, test_d2=dataset.test, device=device, epochs=epochs)
             results.append({
                 'name': dataset.name,
                 'model': model.name,

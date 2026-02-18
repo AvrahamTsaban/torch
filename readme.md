@@ -59,10 +59,9 @@ python main.py
 ```
 
 This will:
-1. Train [`Long_Model`](models.py) on Fashion-MNIST for 10 epochs
-2. Evaluate on built-in test set and custom images
-3. Display accuracy plots
-4. Repeat the process for MNIST digits
+1. Train each model (`Base_Model`, `Long_Model`, `Giant_Model`) on each dataset (Fashion-MNIST, MNIST) for 20 epochs
+2. Evaluate on built-in test set (validation) and custom images
+3. Display accuracy plots for each model × dataset combination
 
 ### Using Custom Images
 
@@ -81,10 +80,10 @@ This will:
 Trains and tests a model on given datasets.
 
 **Parameters:**
+- `model`: Model class to instantiate
 - `train_d`: Training dataset
-- `test_d1`: Built-in test dataset
+- `test_d1`: Built-in test dataset (validation)
 - `test_d2`: Custom test dataset (optional)
-- `model`: Model class (default: [`Base_Model`](models.py))
 - `device`: "cpu" or "cuda" (default: "cpu")
 - `epochs`: Number of training epochs (default: 5)
 
@@ -125,11 +124,13 @@ Converts any PIL image to MNIST format:
 
 ### Models
 
-All models inherit from [`Base_Model`](models.py) and use a flatten layer followed by fully connected layers with ReLU activation.
+All models inherit from [`Base_Model`](models.py) and use a flatten layer followed by fully connected layers with ReLU activation. Each model has a `name` attribute for identification.
 
-- **[`Base_Model`](models.py)**: 28×28 → 64 → 32 → 10
-- **[`Long_Model`](models.py)**: 28×28 → 1024 → 1024 → 1024 → 10
-- **[`Giant_Model`](models.py)**: 28×28 → 16384 → 16384 → 8192 → 512 → 10
+- **[`Base_Model`](models.py)** (`name='Base'`): 28×28 → 64 → 32 → 10
+- **[`Long_Model`](models.py)** (`name='Large'`): 28×28 → 1024 → 1024 → 1024 → 10
+- **[`Giant_Model`](models.py)** (`name='Giant'`): 28×28 → 16384 → 16384 → 8192 → 512 → 10
+
+All models are also available as a list via `models` (exported from [`models.py`](models.py)).
 
 ## Example Usage
 
@@ -141,9 +142,9 @@ from datasets import number_train, number_test
 from main import deep_learning
 
 train_acc, test_acc, _ = deep_learning(
+    model=Base_Model,
     train_d=number_train,
     test_d1=number_test,
-    model=Base_Model,
     device="cuda",
     epochs=10
 )
@@ -184,6 +185,24 @@ From [`datasets.py`](datasets.py):
 - [`number_train`](datasets.py) / [`number_test`](datasets.py): MNIST
 - [`my_fashion_test`](datasets.py): Custom fashion images
 - [`my_number_test`](datasets.py): Custom digit images
+
+### Dataset Bundles
+
+Datasets are grouped into [`Dataset_Bundle`](datasets.py) objects for easy iteration:
+
+```python
+from datasets import sets  # list of Dataset_Bundle objects
+
+for dataset in sets:
+    print(dataset.name)        # e.g. 'Fashion', 'Number'
+    print(dataset.train)       # training dataset
+    print(dataset.validation)  # built-in test dataset
+    print(dataset.test)        # custom test dataset
+```
+
+Available bundles in `sets`:
+- **Fashion**: `fashion_train`, `fashion_test`, `my_fashion_test`
+- **Number**: `number_train`, `number_test`, `my_number_test`
 
 ## License
 

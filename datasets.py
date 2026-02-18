@@ -58,7 +58,7 @@ my_number_test = CustomDataset(
         transform=to_tensor(),
     )
 
-class Dataset():
+class Dataset_Bundle():
     def __init__(self, name, train, validation, test):
         self.name = name
         self.train = train
@@ -66,6 +66,6 @@ class Dataset():
         self.test = test
 
 sets = [
-    Dataset('Fashion', fashion_train, fashion_test, my_fashion_test),
-    Dataset('Number', number_train, number_test, my_number_test),
+    Dataset_Bundle('Fashion', fashion_train, fashion_test, my_fashion_test),
+    Dataset_Bundle('Number', number_train, number_test, my_number_test),
 ]
