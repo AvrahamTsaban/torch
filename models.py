@@ -1,9 +1,10 @@
 from torch import nn
-from torchvision.models import vgg16 as vgg16
 
 """Contains different model architectures for training."""
 
 class Base_Model(nn.Module):
+    name = 'Base'
+
     def __init__(self, device="cpu"):
         super().__init__()
         self.flatten = nn.Flatten()
@@ -22,6 +23,8 @@ class Base_Model(nn.Module):
         return logits
 
 class Long_Model(Base_Model):
+    name = 'Large'
+
     def __init__(self, device="cpu"):
         super().__init__()
         self.flatten = nn.Flatten()
@@ -37,6 +40,8 @@ class Long_Model(Base_Model):
         self.to(device)
 
 class Giant_Model(Base_Model):
+    name = 'Giant'
+
     def __init__(self, device="cpu"):
         super().__init__()
         self.flatten = nn.Flatten()

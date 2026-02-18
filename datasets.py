@@ -57,3 +57,15 @@ my_number_test = CustomDataset(
         path="./data/myNums",
         transform=to_tensor(),
     )
+
+class Dataset():
+    def __init__(self, name, train, validation, test):
+        self.name = name
+        self.train = train
+        self.validation = validation
+        self.test = test
+
+sets = [
+    Dataset('Fashion', fashion_train, fashion_test, my_fashion_test),
+    Dataset('Number', number_train, number_test, my_number_test),
+]
